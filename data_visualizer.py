@@ -38,6 +38,7 @@ def generate_histogram(x_axis, xlabel):
     plt.title(title)
     plt.show()
 
+
 # Save scatterplot as a png image, to a folder called 'scatterplot'
 # x_axis - the X axis of the chart
 # y_axis - the Y axis of the chart
@@ -52,6 +53,7 @@ def image_scatterplot(x_axis, y_axis, xlabel, ylabel):
     plt.savefig(fname="scatterplot" + '\\' + xlabel + '_vs_' + ylabel + '.png', format='png')
     plt.close('all')
 
+
 # Save histogram as a png image, to a folder called 'histogram'
 # x_axis - the X axis of the chart
 # xlabel - the label of the x axis
@@ -63,3 +65,10 @@ def image_histogram(x_axis, xlabel, prefix):
     plt.title(title)
     plt.savefig(fname="histogram" + '\\' + prefix + xlabel + '.png', format='png')
     plt.close('all')
+
+
+# This is used for K-Fold validation
+# x-axis
+# y-axis
+def plot_cv_error():
+    plt.plot()
