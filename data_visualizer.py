@@ -55,10 +55,11 @@ def image_scatterplot(x_axis, y_axis, xlabel, ylabel):
 # Save histogram as a png image, to a folder called 'histogram'
 # x_axis - the X axis of the chart
 # xlabel - the label of the x axis
-def image_histogram(x_axis, xlabel):
+# prefix - prefix to filename
+def image_histogram(x_axis, xlabel, prefix):
     title = "Histogram for: " + xlabel
     plt.hist(x_axis)
     plt.xlabel(xlabel)
     plt.title(title)
-    plt.savefig(fname="histogram" + '\\' + xlabel + '.png', format='png')
+    plt.savefig(fname="histogram" + '\\' + prefix + xlabel + '.png', format='png')
     plt.close('all')
