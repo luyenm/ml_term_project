@@ -28,7 +28,6 @@ def generate_scatterplot(x_axis, y_axis, xlabel, ylabel):
     plt.title(title)
     plt.show()
 
-
 # Generates a scatterplot
 # x_axis - the X axis of the chart
 # y_axis - the Y axis of the chart
@@ -41,3 +40,14 @@ def generate_histogram(x_axis, y_axis, xlabel, ylabel):
     plt.ylabel(ylabel)
     plt.title(title)
     plt.show()
+
+# Save scatterplot as a png image
+def image_scatterplot(x_axis, y_axis, xlabel, ylabel):
+    title = "Bar chart for: " + xlabel + " vs. " + ylabel
+    plt.scatter(x_axis, y_axis)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.savefig(fname="scatterplot" + '\\' + xlabel + '_vs_' + ylabel + '.png', format='png')
+    plt.close('all')
+

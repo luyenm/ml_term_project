@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import data_visualizer as dv
+import os
 
 
 '''
@@ -28,6 +29,8 @@ Current insights about the data:
 '''
 
 training_data = pd.read_csv('trainingset.csv')
+if not os.path.exists('scatterplot'):
+    os.makedirs('scatterplot')
 
 y_axis = training_data.loc[:, 'ClaimAmount']
 x_axis = training_data.drop("ClaimAmount", axis=1, inplace=False)
@@ -35,4 +38,5 @@ x_axis = training_data.drop("ClaimAmount", axis=1, inplace=False)
 for first_feature in x_axis.keys().tolist():
     for second_feature in x_axis.keys().tolist():
         if first_feature != second_feature:
-            dv.generate_scatterplot(x_axis.loc[:, second_feature], x_axis.loc[:, first_feature], second_feature, first_feature)
+            # dv.generate_scatterplot(x_axis.loc[:, second_feature], x_axis.loc[:, first_feature], second_feature, first_feature)
+            dv.image_scatterplot(x_axis.loc[:, second_feature], x_axis.loc[:, first_feature], second_feature, first_feature, )
