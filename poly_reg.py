@@ -3,6 +3,11 @@ import pandas as pd
 import csv_reader as reader
 
 
+'''
+TODO: Implement RSS, and MAE, modify poly kfold to pass a function.
+'''
+
+
 # k-folds cross validation for polynomial regression
 # PARAM: x - training input
 # PARAM: y - training input

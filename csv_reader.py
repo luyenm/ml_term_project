@@ -4,8 +4,12 @@ import data_visualizer as dv
 import os
 
 
+
 '''
 Current insights about the data:
+ASSUMPTIONS:
+Anything below 26 unique values is assume to be categorical.
+
 # rowIndex - ID of person?
 # feature1	(Values are between 0.001 and 1.000)
 # feature2	(Values are between 9 and 940)
@@ -27,7 +31,24 @@ Current insights about the data:
 # feature18	(Values are 0, 1, 2)
 # ClaimAmount - Dollar amount for claims that are made ($1 or $1000)
 '''
+# TODO: Implement more data pre-processing for categorical data.
+
+
+def onehot(dataframe):
+    raw_data = dataframe
+    new_data = []
+    for column in raw_data:
+        if raw_data[column].nunique() <= 27:
+            new_data.append(column)
+    raw_data = pd.get_dummies(raw_data, columns=new_data, prefix=new_data)
+    return raw_data
+
+
 training_data = pd.read_csv('trainingset.csv')
+training_data.drop('rowIndex', axis=1, inplace=True)
+
+print(onehot(training_data).shape[1])
+
 if not os.path.exists('scatterplot'):
     os.makedirs('scatterplot')
 if not os.path.exists('histogram'):
@@ -43,14 +64,12 @@ y_claimed_money = claimed_money.loc[:, 'ClaimAmount']
 x_not_claimed = not_claimed.drop('ClaimAmount', axis=1, inplace=False)
 y_not_claimed = not_claimed.loc[:, 'ClaimAmount']
 
-for first_feature in training_data.keys().tolist():
-    for second_feature in training_data.keys().tolist():
-        if first_feature != second_feature:
-            dv.image_scatterplot(x_claimed_money.loc[:, second_feature], y_claimed_money.loc[:, first_feature], second_feature, first_feature, )
-            dv.image_scatterplot(x_not_claimed.loc[:, second_feature], y_not_claimed.loc[:, first_feature], second_feature, first_feature, )
-
-for feature in training_data.keys().tolist():
-    dv.image_histogram(not_claimed.loc[:, feature], feature, 'not_claimed_')
-    dv.image_histogram(claimed_money.loc[:, feature], feature, 'claimed_money_')
-
-
+# for first_feature in training_data.keys().tolist():
+#     for second_feature in training_data.keys().tolist():
+#         if first_feature != second_feature:
+#             dv.image_scatterplot(x_claimed_money.loc[:, second_feature], y_claimed_money.loc[:, first_feature], second_feature, first_feature, )
+#             dv.image_scatterplot(x_not_claimed.loc[:, second_feature], y_not_claimed.loc[:, first_feature], second_feature, first_feature, )
+#
+# for feature in training_data.keys().tolist():
+#     dv.image_histogram(not_claimed.loc[:, feature], feature, 'not_claimed_')
+#     dv.image_histogram(claimed_money.loc[:, feature], feature, 'claimed_money_')
