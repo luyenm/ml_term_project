@@ -27,16 +27,34 @@ Current insights about the data:
 # feature18	(Values are 0, 1, 2)
 # ClaimAmount - Dollar amount for claims that are made ($1 or $1000)
 '''
-
 training_data = pd.read_csv('trainingset.csv')
 if not os.path.exists('scatterplot'):
     os.makedirs('scatterplot')
 
-y_axis = training_data.loc[:, 'ClaimAmount']
-x_axis = training_data.drop("ClaimAmount", axis=1, inplace=False)
+not_claimed = training_data[training_data.ClaimAmount == 0]
+claimed_money = training_data[training_data.ClaimAmount != 0]
 
-for first_feature in x_axis.keys().tolist():
-    for second_feature in x_axis.keys().tolist():
-        if first_feature != second_feature:
-            # dv.generate_scatterplot(x_axis.loc[:, second_feature], x_axis.loc[:, first_feature], second_feature, first_feature)
-            dv.image_scatterplot(x_axis.loc[:, second_feature], x_axis.loc[:, first_feature], second_feature, first_feature, )
+print(len(not_claimed), len(claimed_money))
+
+x_axis = claimed_money.drop('ClaimAmount', axis=1, inplace=False)
+y_axis = claimed_money.loc[:, 'ClaimAmount']
+
+
+# x_axis = training_data.drop(["rowIndex", "ClaimAmount"], axis=1, inplace=False)
+#
+# # for first_feature in x_axis.keys().tolist():
+# #     for second_feature in x_axis.keys().tolist():
+# #         if first_feature != second_feature:
+# #             dv.generate_scatterplot(x_axis.loc[:, second_feature],
+# #                                     x_axis.loc[:, first_feature],
+# #                                     second_feature,
+# #                                     first_feature)
+
+# for first_feature in x_axis.keys().tolist():
+#     for second_feature in x_axis.keys().tolist():
+#         if first_feature != second_feature:
+#             # dv.generate_scatterplot(x_axis.loc[:, second_feature], x_axis.loc[:, first_feature], second_feature, first_feature)
+#             dv.image_scatterplot(x_axis.loc[:, second_feature], x_axis.loc[:, first_feature], second_feature, first_feature, )
+
+for feature in x_axis.keys().tolist():
+    dv.generate_scatterplot(x_axis.loc[:, feature], y_axis, feature, "Claim Amount")
