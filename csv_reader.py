@@ -4,7 +4,6 @@ import data_visualizer as dv
 import os
 
 
-
 '''
 Current insights about the data:
 ASSUMPTIONS:
@@ -47,8 +46,6 @@ def onehot(dataframe):
 training_data = pd.read_csv('trainingset.csv')
 training_data.drop('rowIndex', axis=1, inplace=True)
 
-print(onehot(training_data).shape[1])
-
 if not os.path.exists('scatterplot'):
     os.makedirs('scatterplot')
 if not os.path.exists('histogram'):
@@ -57,6 +54,9 @@ if not os.path.exists('histogram'):
 not_claimed = training_data[training_data.ClaimAmount == 0]
 claimed_money = training_data[training_data.ClaimAmount != 0]
 
+not_claimed_categorical = onehot(not_claimed)
+claimed_money_categorical = onehot(claimed_money)
+
 print('Not claim: ', len(not_claimed), '\t\tClaim Money: ', len(claimed_money))
 
 x_claimed_money = claimed_money.drop('ClaimAmount', axis=1, inplace=False)
@@ -64,12 +64,7 @@ y_claimed_money = claimed_money.loc[:, 'ClaimAmount']
 x_not_claimed = not_claimed.drop('ClaimAmount', axis=1, inplace=False)
 y_not_claimed = not_claimed.loc[:, 'ClaimAmount']
 
-# for first_feature in training_data.keys().tolist():
-#     for second_feature in training_data.keys().tolist():
-#         if first_feature != second_feature:
-#             dv.image_scatterplot(x_claimed_money.loc[:, second_feature], y_claimed_money.loc[:, first_feature], second_feature, first_feature, )
-#             dv.image_scatterplot(x_not_claimed.loc[:, second_feature], y_not_claimed.loc[:, first_feature], second_feature, first_feature, )
-#
-# for feature in training_data.keys().tolist():
-#     dv.image_histogram(not_claimed.loc[:, feature], feature, 'not_claimed_')
-#     dv.image_histogram(claimed_money.loc[:, feature], feature, 'claimed_money_')
+x_claimed_money_categorical = claimed_money_categorical.drop('ClaimAmount', axis=1, inplace=False)
+y_claimed_money_categorical = claimed_money_categorical.loc[:, 'ClaimAmount']
+x_not_claimed_categorical = not_claimed.drop('ClaimAmount', axis=1, inplace=False)
+y_not_claimed_categorical = not_claimed.loc[:, 'ClaimAmount']
