@@ -6,7 +6,7 @@ from sklearn.linear_model import Ridge
 # TODO: Implement ridge regression for the 110 columns after data pre-processing
 
 
-# Performs ridge regression
+# Performs ridge regression and K-Fold cross validation.
 # x - inputs
 # y - outputs
 # k - kfolds

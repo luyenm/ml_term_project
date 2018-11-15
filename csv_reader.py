@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import data_visualizer as dv
+import poly_reg as pg
 import os
 
 
@@ -37,7 +38,7 @@ def onehot(dataframe):
     raw_data = dataframe
     new_data = []
     for column in raw_data:
-        if raw_data[column].nunique() <= 27:
+        if raw_data[column].nunique() <= 51:
             new_data.append(column)
     raw_data = pd.get_dummies(raw_data, columns=new_data, prefix=new_data)
     return raw_data
@@ -57,7 +58,7 @@ claimed_money = training_data[training_data.ClaimAmount != 0]
 not_claimed_categorical = onehot(not_claimed)
 claimed_money_categorical = onehot(claimed_money)
 
-print('Not claim: ', len(not_claimed), '\t\tClaim Money: ', len(claimed_money))
+print('Not claim: ', len(not_claimed), '\t\tClaimed Money: ', len(claimed_money))
 
 x_claimed_money = claimed_money.drop('ClaimAmount', axis=1, inplace=False)
 y_claimed_money = claimed_money.loc[:, 'ClaimAmount']
@@ -68,3 +69,15 @@ x_claimed_money_categorical = claimed_money_categorical.drop('ClaimAmount', axis
 y_claimed_money_categorical = claimed_money_categorical.loc[:, 'ClaimAmount']
 x_not_claimed_categorical = not_claimed.drop('ClaimAmount', axis=1, inplace=False)
 y_not_claimed_categorical = not_claimed.loc[:, 'ClaimAmount']
+
+
+def get_claims():
+    return x_claimed_money, y_claimed_money
+
+
+def get_claims_categorical():
+    return x_claimed_money_categorical, y_claimed_money_categorical
+
+
+def get_unclaimed():
+    return x_not_claimed, y_not_claimed

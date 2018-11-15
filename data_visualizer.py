@@ -70,5 +70,10 @@ def image_histogram(x_axis, xlabel, prefix):
 # This is used for K-Fold validation
 # x-axis
 # y-axis
-def plot_cv_error():
-    plt.plot()
+def plot_line_graph(x_axis, y_axis, xlabel, ylabel, title):
+    plt.plot(x_axis, y_axis)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.savefig(fname="line_plot" + '\\' + xlabel + '_vs_' + ylabel + '.png', format='png')
+    plt.close('all')
