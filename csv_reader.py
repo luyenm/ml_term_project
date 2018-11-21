@@ -46,6 +46,8 @@ def onehot(dataframe):
 
 training_data = pd.read_csv('trainingset.csv')
 training_data.drop('rowIndex', axis=1, inplace=True)
+test_data = pd.read_csv('testset.csv')
+test_data.drop('rowIndex', axis=1, inplace=True)
 
 if not os.path.exists('scatterplot'):
     os.makedirs('scatterplot')
@@ -88,3 +90,7 @@ def get_claims_categorical():
 
 def get_unclaimed():
     return x_not_claimed, y_not_claimed
+
+
+def get_testset():
+    return test_data

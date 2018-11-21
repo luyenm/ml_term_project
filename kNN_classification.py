@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.neighbors import RadiusNeighborsClassifier
 from sklearn.neighbors import KNeighborsClassifier
 import pandas as pd
-
+import csv_reader as reader
 
 # Radius classification, this is used to determine whether or not a claim is a claim or not and returns a dataframe
 # Of claims
@@ -57,3 +57,24 @@ def knn_classifier(claimed_x, claimed_y, r, k_folds):
         cv_error.append(cv_incorrect/len(cv_predictions))
 
     return np.mean(train_error), np.mean(cv_error)
+
+
+def knn_filter(input_x, k_neighbors):
+    training_x, training_y = reader.get_dataset()
+    filtered_x = pd.DataFrame.copy(input_x)
+    filtered_x = filtered_x.drop(filtered_x.index[0:len(filtered_x)])
+    claim_count = []
+    model = KNeighborsClassifier(n_neighbors=k_neighbors)
+    for i in training_y:
+        if i != 0:
+            claim_count.append(1)
+        else:
+            claim_count.append(0)
+
+    model.fit(training_x, claim_count)
+    predictions = model.predict(input_x)
+    for i in range(len(input_x)):
+        filtered_x.append(input_x.loc[[i]])
+
+    print(type(filtered_x))
+    return filtered_x
