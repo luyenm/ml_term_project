@@ -1,16 +1,20 @@
 import csv_reader as reader
 import poly_reg as pg
 import data_visualizer as dv
+import best_subset_selector as bss
+import kNN_classification as knn
 
-x_claimed_money_categorical, y_claimed_money_categorical = reader.get_claims_categorical()
+x_claimed_money_categorical, y_claimed_money_categorical = reader.get_dataset()
 
 kfolds = [2, 3, 4, 5, 6, 7, 8, 9, 10]
-poly_reg = [1, 2, 3, 4, 4, 5, 6, 7]
+poly_reg = range(1, 15, 1)
+
+mae = []
 train_error = []
 cv_error = []
-mae = []
-for i in kfolds:
-    for k in poly_reg:
-        te, cve = pg.poly_kfold_cv(x_claimed_money_categorical, y_claimed_money_categorical, poly_reg, kfolds)
-        train_error.append(te)
-        cv_error.append(cve)
+for k in poly_reg:
+    te, cve = knn.knn_classifier(x_claimed_money_categorical, y_claimed_money_categorical, k, 5)
+    print("Training Error", te, "CV Error", cve, "K neighbors:", k)
+    train_error.append(te)
+    cv_error.append(cve)
+dv.plot_line_graph(train_error, cv_error, poly_reg, "Error", "Degrees", "Error for ridge regression degrees")

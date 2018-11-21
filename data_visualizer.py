@@ -70,10 +70,11 @@ def image_histogram(x_axis, xlabel, prefix):
 # This is used for K-Fold validation
 # x-axis
 # y-axis
-def plot_line_graph(x_axis, y_axis, xlabel, ylabel, title):
-    plt.plot(x_axis, y_axis)
+def plot_line_graph(x_axis, x_axis2, y_axis, xlabel, ylabel, title):
+    plt.plot(y_axis, x_axis)
+    plt.plot(y_axis, x_axis2)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.savefig(fname="line_plot" + '\\' + xlabel + '_vs_' + ylabel + '.png', format='png')
+    plt.savefig(fname="line plot" + '\\' + xlabel + '_vs_' + ylabel + '.png', format='png')
     plt.close('all')

@@ -60,6 +60,9 @@ claimed_money_categorical = onehot(claimed_money)
 
 print('Not claim: ', len(not_claimed), '\t\tClaimed Money: ', len(claimed_money))
 
+x_training_data = training_data.drop('ClaimAmount', axis=1, inplace=False)
+y_training_data = training_data.loc[:, 'ClaimAmount']
+
 x_claimed_money = claimed_money.drop('ClaimAmount', axis=1, inplace=False)
 y_claimed_money = claimed_money.loc[:, 'ClaimAmount']
 x_not_claimed = not_claimed.drop('ClaimAmount', axis=1, inplace=False)
@@ -69,6 +72,10 @@ x_claimed_money_categorical = claimed_money_categorical.drop('ClaimAmount', axis
 y_claimed_money_categorical = claimed_money_categorical.loc[:, 'ClaimAmount']
 x_not_claimed_categorical = not_claimed.drop('ClaimAmount', axis=1, inplace=False)
 y_not_claimed_categorical = not_claimed.loc[:, 'ClaimAmount']
+
+
+def get_dataset():
+    return x_training_data, y_training_data
 
 
 def get_claims():
