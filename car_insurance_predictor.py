@@ -4,8 +4,8 @@ import data_visualizer as dv
 import best_subset_selector as bss
 import kNN_classification as knn
 
-x_claimed_money_categorical, y_claimed_money_categorical = reader.get_dataset()
-test_set = reader.get_testset()
+x_claimed_money_categorical, y_claimed_money_categorical = reader.get_claims()
+test_set = reader.get_testset_categorical()
 
 kfolds = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 poly_reg = range(1, 15, 1)
@@ -19,7 +19,8 @@ cv_error = []
 #     train_error.append(te)
 #     cv_error.append(cve)
 # dv.plot_line_graph(train_error, cv_error, poly_reg, "Error", "Degrees", "Error for ridge regression degrees")
+print(test_set)
+prediction_set = knn.knn_filter(test_set, 15)
+predictions = pg.poly_train(prediction_set, x_claimed_money_categorical, y_claimed_money_categorical, 5)
 
-training_set = knn.knn_filter(test_set, 15)
-print(len(test_set), len(training_set))
-
+print(predictions)

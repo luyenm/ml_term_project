@@ -38,7 +38,7 @@ def onehot(dataframe):
     raw_data = dataframe
     new_data = []
     for column in raw_data:
-        if raw_data[column].nunique() <= 51:
+        if raw_data[column].nunique() <= 26:
             new_data.append(column)
     raw_data = pd.get_dummies(raw_data, columns=new_data, prefix=new_data)
     return raw_data
@@ -48,6 +48,7 @@ training_data = pd.read_csv('trainingset.csv')
 training_data.drop('rowIndex', axis=1, inplace=True)
 test_data = pd.read_csv('testset.csv')
 test_data.drop('rowIndex', axis=1, inplace=True)
+
 
 if not os.path.exists('scatterplot'):
     os.makedirs('scatterplot')
@@ -59,11 +60,15 @@ claimed_money = training_data[training_data.ClaimAmount != 0]
 
 not_claimed_categorical = onehot(not_claimed)
 claimed_money_categorical = onehot(claimed_money)
+training_data_categorical = onehot(training_data)
 
 print('Not claim: ', len(not_claimed), '\t\tClaimed Money: ', len(claimed_money))
 
 x_training_data = training_data.drop('ClaimAmount', axis=1, inplace=False)
 y_training_data = training_data.loc[:, 'ClaimAmount']
+x_training_data_categorical = training_data_categorical.drop('ClaimAmount', axis=1, inplace=False)
+y_training_data_categorical = training_data_categorical.loc[:, 'ClaimAmount']
+
 
 x_claimed_money = claimed_money.drop('ClaimAmount', axis=1, inplace=False)
 y_claimed_money = claimed_money.loc[:, 'ClaimAmount']
@@ -75,9 +80,13 @@ y_claimed_money_categorical = claimed_money_categorical.loc[:, 'ClaimAmount']
 x_not_claimed_categorical = not_claimed.drop('ClaimAmount', axis=1, inplace=False)
 y_not_claimed_categorical = not_claimed.loc[:, 'ClaimAmount']
 
+#
+# def get_dataset():
+#     return x_training_data, y_training_data
 
-def get_dataset():
-    return x_training_data, y_training_data
+
+def get_dataset_categorical():
+    return x_training_data_categorical, y_training_data_categorical
 
 
 def get_claims():
@@ -94,3 +103,7 @@ def get_unclaimed():
 
 def get_testset():
     return test_data
+
+
+def get_testset_categorical():
+    return onehot(test_data)
