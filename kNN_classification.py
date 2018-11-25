@@ -21,7 +21,6 @@ def knn_classifier(claimed_x, claimed_y, r, k_folds):
     for i in range(k_folds):
         claim_train = []
         claim_validation = []
-
         training_incorrect = 0
         cv_incorrect = 0
         index_start = int(i * number_of_fold_indexes)
