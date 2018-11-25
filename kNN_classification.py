@@ -46,6 +46,7 @@ def knn_classifier(claimed_x, claimed_y, r, k_folds):
 
         model.fit(X=train_x, y=claim_train)
         training_predictions = model.predict(train_x)
+        print(claim_train.count(1), np.unique(training_predictions, return_counts=True))
         cv_predictions = model.predict(validation_x)
         for j in range(len(training_predictions)):
             if training_predictions[j] != claim_train[j]:
@@ -79,4 +80,4 @@ def knn_filter(input_x, k_neighbors):
     for i in range(len(input_x)):
         if predictions[i] == 1:
             filtered_x = filtered_x.append(input_x.loc[[i]])
-    return filtered_x
+    return filtered_x, predictions
