@@ -101,6 +101,10 @@ def get_unclaimed():
     return x_not_claimed, y_not_claimed
 
 
+def get_trainset():
+    return training_data
+
+
 def get_testset():
     return test_data
 
