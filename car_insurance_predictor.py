@@ -41,7 +41,7 @@ test_data = test.drop('ClaimAmount', axis=1, inplace=False)
 test_data = test_data.values
 test_labels = test.loc[:,'ClaimAmount']
 test_labels = test_labels.values
-mae, history = tf_reg.adadelta_cv(tf_reg.build_Adamax(train_data.shape[1]), train_data, train_labels, test_data, test_labels, 500)
+mae, history = tf_reg.adadelta_cv(tf_reg.build_Adadelta(train_data.shape[1]), train_data, train_labels, test_data, None, 500)
 print('mae', mae)
 
 
