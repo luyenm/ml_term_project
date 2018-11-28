@@ -6,6 +6,7 @@ import kNN_classification as knn
 import numpy as np
 import tensorflow_regression as tf_reg
 import scv_classification as svc
+from sklearn import metrics as sklearn_metrics
 
 x_claimed_money_categorical, y_claimed_money_categorical = reader.get_dataset_categorical()
 x_test_set = reader.get_testset_categorical()
@@ -20,15 +21,15 @@ valid_y = y_claimed_money_categorical.drop(y_claimed_money_categorical.index[tes
 kfolds = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 n_neighbors = [0.001, 0.01, 0.1, 1, 5, 10, 100]
 
-mae = []
-train_error = []
-cv_error = []
-for k in n_neighbors:
-    te, cve = svc.svc_kfold_cv(x_claimed_money_categorical, y_claimed_money_categorical, k, 5)
-    print("Training Error", te, "CV Error", cve, "C Value", k)
-    train_error.append(te)
-    cv_error.append(cve)
-dv.plot_line_graph(train_error, cv_error, n_neighbors, "Error", "Degrees", "Classification error graph")
+# mae = []
+# train_error = []
+# cv_error = []
+# for k in n_neighbors:
+#     te, cve = svc.svc_kfold_cv(x_claimed_money_categorical, y_claimed_money_categorical, k, 5)
+#     print("Training Error", te, "CV Error", cve, "C Value", k)
+#     train_error.append(te)
+#     cv_error.append(cve)
+# dv.plot_line_graph(train_error, cv_error, n_neighbors, "Error", "Degrees", "Classification error graph")
 
 # data = reader.get_trainset()
 # split = int(data.shape[0]*0.7)
@@ -45,18 +46,37 @@ dv.plot_line_graph(train_error, cv_error, n_neighbors, "Error", "Degrees", "Clas
 # mae, history = tf_reg.adadelta_cv(tf_reg.build_Adadelta(train_data.shape[1]), train_data, train_labels, test_data, None, 500)
 # print('mae', mae)
 
+test_predictions = []
 
+print(np.count_nonzero(valid_y))
 prediction_set, claim_collection = knn.knn_filter(valid_x, 1)
-predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(test_x.shape[1]), test_x, test_y, prediction_set, None, 25)
+print(np.count_nonzero(claim_collection))
+# predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(test_x.shape[1]), test_x, test_y, prediction_set, None, 100)
+predictions = pg.poly_reg_predict(prediction_set, test_x, test_y, 1)
+
+list_of_claims = []
+for i in valid_y:
+    if i > 0:
+        list_of_claims.append(1)
+    else:
+        list_of_claims.append(0)
+
+f1_score = sklearn_metrics.f1_score(list_of_claims, claim_collection, average='micro')
+
 j = 0
+full_prediction = []
 for i in claim_collection:
     if i == 1:
-        if predictions[j] < 0:
-            predictions[j] = 0
-        claim_collection[i] = predictions[j]
+        if predictions[j] <= 0:
+            predictions[j] = abs(predictions[j])
+        full_prediction.append(predictions[j])
         j += 1
+    else:
+        full_prediction.append(0)
+print('f1_score', f1_score)
 print(len(predictions), len(valid_y))
 
+print(np.mean(abs(full_prediction - valid_y)))
 
-print(np.mean(abs(claim_collection-valid_y)))
-
+for i in range(len(claim_collection)):
+    print('{:7.2f}'.format(full_prediction[i]), "\t\t\t", valid_y[i])

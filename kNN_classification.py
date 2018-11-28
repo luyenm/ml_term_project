@@ -66,6 +66,7 @@ def knn_filter(input_x, k_neighbors):
     print(input_x.loc[[0]])
     filtered_x = pd.DataFrame(data=input_x)
     filtered_x = filtered_x.drop(filtered_x.index[0:len(filtered_x)])
+
     claim_count = []
     model = KNeighborsClassifier(n_neighbors=k_neighbors)
     for i in training_y:

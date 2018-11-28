@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import pandas as pd
 from tensorflow import keras
-import sklearn.linear_model as lin_reg
 import time
 
 import numpy as np
@@ -30,16 +29,10 @@ def build_Adadelta(column):
     return build_model(tf.train.AdadeltaOptimizer(), column)
 
 
-def build_RMSProp(column):
-    print('RMSPropOptimizer initialized')
-    return build_model(tf.train.RMSPropOptimizer(0.001), column)
-
-
 # Display training progress by printing a single dot for each completed epoch
 class PrintDot(keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs):
-    if epoch % 100 == 0: print('')
-    elapse = str(time.time() - START)
+    elapse = str(time.time() - START) + 's'
     if epoch % 25 == 0: print(elapse)
     print('.', end='')
 
@@ -82,7 +75,10 @@ def adadelta_cv(model, train_data, train_labels, test_data, test_labels=None, E=
                         workers=8, use_multiprocessing=True)
     if test_labels is None:
         pred = model.predict(test_data, verbose=0)
-        return pred
+        output = []
+        for item in range(len(pred)):
+            output.append(pred[item][0])
+        return output
     else:
         [loss, mae] = model.evaluate(test_data, test_labels, verbose=0)
         print()

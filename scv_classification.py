@@ -1,5 +1,8 @@
 from sklearn.svm import SVC
 import numpy as np
+import csv_reader as reader
+import pandas as pd
+
 
 def svc_kfold_cv(input_data, output_data, alpha, kfolds=10):
 
@@ -10,7 +13,6 @@ def svc_kfold_cv(input_data, output_data, alpha, kfolds=10):
     for i in range(kfolds):
         claim_train = []
         claim_validation = []
-
 
         index_start = int(i * kfold_indices)
         index_end = int(len(input_data) - (kfold_indices * (kfolds - i - 1)))
@@ -45,3 +47,25 @@ def svc_kfold_cv(input_data, output_data, alpha, kfolds=10):
                         / np.size(cv_predictions))
 
         return np.mean(train_error), np.mean(cv_error)
+
+
+def svc_classifier(input_data, alpha):
+    training_input, training_output = reader.get_dataset_categorical()
+    filtered_x = pd.DataFrame(data=training_input)
+    filtered_x = filtered_x.drop(filtered_x.index[0:len(filtered_x)])
+    claim_count = []
+    model = SVC(C=alpha, kernel='linear')
+    for i in training_output:
+        if i != 0:
+            claim_count.append(1)
+        else:
+            claim_count.append(0)
+    print("Fitting filter data...")
+    model.fit(training_input, claim_count)
+    print("Making predictions...")
+    predictions = model.predict(input_data)
+    print(np.count_nonzero(predictions))
+    for i in range(len(input_data)):
+        if predictions[i] == 1:
+            filtered_x = filtered_x.append(input_data.loc[[i]])
+    return filtered_x, predictions

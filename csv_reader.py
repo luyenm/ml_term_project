@@ -29,6 +29,8 @@ Anything below 26 unique values is assume to be categorical.
 # feature16	(Values are 0 .. 5)
 # feature17	(Values are 1 .. 20)
 # feature18	(Values are 0, 1, 2)
+
+
 # ClaimAmount - Dollar amount for claims that are made ($1 or $1000)
 '''
 # TODO: Implement more data pre-processing for categorical data.
@@ -36,15 +38,18 @@ Anything below 26 unique values is assume to be categorical.
 
 def onehot(dataframe):
     raw_data = dataframe
-    new_data = []
-    for column in raw_data:
-        if raw_data[column].nunique() <= 26:
-            new_data.append(column)
+    new_data = ['feature3', 'feature6', 'feature11', 'feature7', 'feature12', 'feature13', 'feature14', 'feature15',
+                'feature16', 'feature17', 'feature18']
+    # new_data = []
+    # for column in raw_data:
+    #     if raw_data[column].nunique() <= 26:
+    #         new_data.append(column)
     raw_data = pd.get_dummies(raw_data, columns=new_data, prefix=new_data)
     return raw_data
 
 
 training_data = pd.read_csv('trainingset.csv')
+training_data = training_data.sample(frac=1).reset_index(drop=True)
 training_data.drop('rowIndex', axis=1, inplace=True)
 test_data = pd.read_csv('testset.csv')
 test_data.drop('rowIndex', axis=1, inplace=True)
