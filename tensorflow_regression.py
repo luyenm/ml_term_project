@@ -61,7 +61,8 @@ def plot_history(history):
 
 # Inputs:
 #   E: Epochs, or number of iterations to execute
-def adadelta_cv(train_data, train_labels, test_data, test_labels, E):
+def adadelta_cv(model, train_data, train_labels, test_data, test_labels=None, E=100):
+    # Check datatype to be np.ndarray
     if train_data is pd.core.frame.DataFrame:
         train_data = train_data.values
     if train_labels is pd.core.series.Series:
@@ -70,14 +71,20 @@ def adadelta_cv(train_data, train_labels, test_data, test_labels, E):
         test_data = test_data.values
     if test_labels is pd.core.series.Series:
         test_labels = test_labels.values
-    model = build_Adadelta(train_data.shape[1])
+    # Get the tensorflow model and optimizer to use
     EPOCHS = E
+    print('EPOCHS', EPOCHS)
     early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=25)
+    # Fitting the data
     history = model.fit(train_data, train_labels, epochs=EPOCHS,
                         validation_split=0.1, verbose=0,
                         callbacks=[early_stop, PrintDot()],
-                        use_multiprocessing=True)
-    [loss, mae] = model.evaluate(test_data, test_labels, verbose=0)
-    print()
-    print("TensorFlow Keras API - Testing set Mean Abs Error: {:7.2f}".format(mae))
-    return mae, model
+                        workers=8, use_multiprocessing=True)
+    if test_labels is None:
+        pred = model.predict(test_data, verbose=0)
+        return pred
+    else:
+        [loss, mae] = model.evaluate(test_data, test_labels, verbose=0)
+        print()
+        print("TensorFlow Keras API - Testing set Mean Abs Error: {:7.2f}".format(mae))
+        return mae, history
