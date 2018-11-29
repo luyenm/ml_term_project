@@ -37,7 +37,7 @@ def test_model(input_values, output_values):
     print("Model assessment MAE:", np.mean(cv_error))
 
 
-test_model(test_x, test_y)
+# test_model(test_x, test_y)
 
 
 # dv.plot_line_graph(train_error, cv_error, n_neighbors, "Error", "Degrees", "Classification error graph")
@@ -61,12 +61,13 @@ test_predictions = []
 
 print(np.count_nonzero(valid_y))
 print("Filtering Data...")
-prediction_set, claim_collection = knn.knn_filter(test_x, valid_y, 1)
+small_claims, large_claims, claim_collection = knn.knn_filter(valid_x, 1)
 print(np.count_nonzero(claim_collection))
 print("Predicting...")
+print(len(small_claims), len(large_claims))
 # predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(x_claimed_money_categorical.shape[1]), x_claimed_money_categorical, y_claimed_money_categorical, prediction_set, None, 100)
-predictions = pg.poly_reg_predict(prediction_set, test_x, test_y, 1)
-
+small_predictions = pg.poly_reg_predict(small_claims, test_x, test_y, 1)
+large_predictions = pg.poly_reg_predict(large_claims, test_x, test_y, 1)
 print("Generating a list of claims for F1 score...")
 list_of_claims = []
 for i in claim_collection:
@@ -79,17 +80,19 @@ for i in claim_collection:
 
 print("Generating full list of predictions...")
 j = 0
+k = 0
 full_prediction = []
 for i in claim_collection:
     if i == 1:
-        if predictions[j] <= 0:
-            predictions[j] = abs(predictions[j])
-        full_prediction.append(predictions[j])
+        full_prediction.append(small_predictions[j])
         j += 1
+    elif i == 2:
+        full_prediction.append(large_predictions[k])
+        k += 1
     else:
         full_prediction.append(0)
 # print('f1_score', f1_score)
-print(len(predictions), len(valid_y))
+# print(len(predictions), len(valid_y))
 
 # for i in full_prediction:
 #     print(i)

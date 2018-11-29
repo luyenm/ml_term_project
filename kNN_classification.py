@@ -58,31 +58,35 @@ def knn_classifier(claimed_x, claimed_y, r, k_folds):
               claim_validation.count(1),
               claim_validation.count(2),
               np.unique(cv_predictions, return_counts=True))
-        train_error.append(np.mean((np.size(claim_train) - np.count_nonzero(training_predictions == claim_train))))
-        cv_error.append(np.mean(np.size(claim_validation) - np.count_nonzero(cv_predictions == claim_validation)))
+        train_error.append(((np.size(claim_train) - np.count_nonzero(training_predictions == claim_train)) / len(claim_train)))
+        cv_error.append((np.size(claim_validation) - np.count_nonzero(cv_predictions == claim_validation) / len(claim_validation)))
     return np.mean(train_error), np.mean(cv_error)
 
 
-def knn_filter(input_x, input_y, k_neighbors):
+def knn_filter(input_x, k_neighbors):
     training_x, training_y = reader.get_dataset_categorical()
     print(training_x.loc[[0]])
     print(input_x.loc[[0]])
-    filtered_x = pd.DataFrame(data=input_x)
-    filtered_x = filtered_x.drop(filtered_x.index[0:len(filtered_x)])
-    filtered_y = []
+    small_claims = pd.DataFrame(data=input_x)
+    small_claims = small_claims.drop(small_claims.index[0:len(small_claims)])
+    large_claims = pd.DataFrame(data=input_x)
+    large_claims = large_claims.drop(large_claims.index[0:len(large_claims)])
     claim_count = []
     model = KNeighborsClassifier(n_neighbors=k_neighbors)
-    for i in training_y:
-        if i != 0:
+    for j in training_y:
+        if j == 0:
+            claim_count.append(0)
+        elif j < 1000:
             claim_count.append(1)
         else:
-            claim_count.append(0)
+            claim_count.append(2)
     print("Fitting KNN model...")
     model.fit(training_x, claim_count)
     print("Making KNN predictions...")
     predictions = model.predict(input_x)
-    for i in range(len(input_x)):
+    for i in range(len(predictions)):
         if predictions[i] == 1:
-            filtered_x = filtered_x.append(input_x.loc[[i]])
-            filtered_y.append(input_y.loc[[i]])
-    return filtered_x, predictions
+            small_claims = small_claims.append(input_x.loc[[i]])
+        elif predictions[i] == 2:
+            large_claims = large_claims.append(input_x.loc[[i]])
+    return small_claims, large_claims, predictions
