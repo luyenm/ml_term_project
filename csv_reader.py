@@ -125,4 +125,4 @@ def get_testset():
 
 
 def get_testset_categorical():
-    return onehot(test_data)
+    return normalization(onehot(test_data))

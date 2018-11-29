@@ -56,7 +56,7 @@ prediction_set, claim_collection = knn.knn_filter(valid_x, valid_y, 1)
 print(np.count_nonzero(claim_collection))
 print("Predicting...")
 # predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(test_x.shape[1]), test_x, test_y, prediction_set, None, 100)
-predictions = pg.poly_reg_predict(prediction_set, test_x, test_y, 2)
+predictions = pg.poly_reg_predict(x_test_set, x_claimed_money_categorical, y_claimed_money_categorical, 1)
 
 print("Generating a list of claims for F1 score...")
 list_of_claims = []
@@ -82,7 +82,10 @@ for i in claim_collection:
 # print('f1_score', f1_score)
 print(len(predictions), len(valid_y))
 
-print(np.mean(abs(full_prediction - valid_y)))
+for i in full_prediction:
+    print(i)
 
-for i in range(len(claim_collection)):
-    print('{:7.2f}'.format(full_prediction[i]), "\t\t\t", valid_y[i])
+# print(np.mean(abs(full_prediction - valid_y)))
+#
+# for i in range(len(claim_collection)):
+#     print('{:7.2f}'.format(full_prediction[i]), "\t\t\t", valid_y[i])
