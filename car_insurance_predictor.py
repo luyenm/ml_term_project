@@ -22,7 +22,7 @@ test_y = y_claimed_money_categorical.loc[0:test_indices]
 valid_x = x_claimed_money_categorical.drop(x_claimed_money_categorical.index[test_indices:len(x_claimed_money_categorical)])
 valid_y = y_claimed_money_categorical.drop(y_claimed_money_categorical.index[test_indices:len(x_claimed_money_categorical)])
 
-n_neighbors = range(1, 15)
+n_neighbors = [1]
 
 
 def test_model(input_values, output_values):
@@ -37,7 +37,7 @@ def test_model(input_values, output_values):
     print("Model assessment MAE:", np.mean(cv_error))
 
 
-# test_model(test_x, test_y)
+test_model(test_x, test_y)
 
 
 # dv.plot_line_graph(train_error, cv_error, n_neighbors, "Error", "Degrees", "Classification error graph")
@@ -83,10 +83,10 @@ j = 0
 k = 0
 full_prediction = []
 for i in claim_collection:
-    if i == 1:
+    if i == 1 and small_predictions[j] > 0:
         full_prediction.append(small_predictions[j])
         j += 1
-    elif i == 2:
+    elif i == 2 and large_predictions[k] > 0:
         full_prediction.append(large_predictions[k])
         k += 1
     else:

@@ -38,15 +38,30 @@ Anything below 26 unique values is assume to be categorical.
 
 
 def onehot(dataframe):
-    raw_data = dataframe
-    new_data = ['feature3', 'feature11', 'feature7', 'feature12', 'feature13', 'feature14', 'feature15',
-                'feature16', 'feature17', 'feature18']
-    # new_data = []
-    # for column in raw_data:
-    #     if raw_data[column].nunique() <= 26:
-    #         new_data.append(column)
-    raw_data = pd.get_dummies(raw_data, columns=new_data, prefix=new_data)
-    return raw_data
+    TEXT = 'onehot|'
+    print(TEXT, 'Making onehot')
+    NEW_DATA = {'feature3': range(0,9), 'feature6': range(0, 52),
+     'feature7': range(0, 4), 'feature11': range(0, 9),
+     'feature12': range(0, 27), 'feature13': range(0, 6),
+     'feature14': range(0, 4), 'feature15': range(0, 10),
+     'feature16': range(0, 6), 'feature17': range(1, 21),
+     'feature18': range(0, 3)
+     }
+    new_dataframe = pd.DataFrame()
+    for key in dataframe.keys().values:
+        if key not in NEW_DATA.keys():
+            #print(TEXT, 'add key', key)
+            new_dataframe[key] = dataframe.loc[:,key]
+        else:
+            col = dataframe.loc[:,key]
+            col = col.values
+            for increment in NEW_DATA.get(key):
+                new_col = []
+                for row in col: new_col.append(1 if row == increment else 0)
+                label = key+'_'+increment.__str__()
+                #print(TEXT, 'add key', label)
+                new_dataframe[label] = new_col
+    return new_dataframe
 
 
 def normalization(dataframe):
