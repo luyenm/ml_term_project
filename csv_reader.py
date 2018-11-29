@@ -39,7 +39,7 @@ Anything below 26 unique values is assume to be categorical.
 
 def onehot(dataframe):
     raw_data = dataframe
-    new_data = ['feature3', 'feature6', 'feature11', 'feature7', 'feature12', 'feature13', 'feature14', 'feature15',
+    new_data = ['feature3', 'feature11', 'feature7', 'feature12', 'feature13', 'feature14', 'feature15',
                 'feature16', 'feature17', 'feature18']
     # new_data = []
     # for column in raw_data:

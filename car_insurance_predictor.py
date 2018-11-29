@@ -52,11 +52,11 @@ test_predictions = []
 
 print(np.count_nonzero(valid_y))
 print("Filtering Data...")
-prediction_set, claim_collection = knn.knn_filter(valid_x, valid_y, 1)
+prediction_set, claim_collection = knn.knn_filter(x_test_set, valid_y, 1)
 print(np.count_nonzero(claim_collection))
 print("Predicting...")
 # predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(test_x.shape[1]), test_x, test_y, prediction_set, None, 100)
-predictions = pg.poly_reg_predict(x_test_set, x_claimed_money_categorical, y_claimed_money_categorical, 1)
+predictions = pg.poly_reg_predict(prediction_set, x_claimed_money_categorical, y_claimed_money_categorical, 1)
 
 print("Generating a list of claims for F1 score...")
 list_of_claims = []
