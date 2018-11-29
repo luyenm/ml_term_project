@@ -10,19 +10,24 @@ from sklearn import metrics as sklearn_metrics
 import pandas as pd
 
 print("Getting datasets...")
-x_claimed_money_categorical, y_claimed_money_categorical = reader.get_dataset_categorical()
+dataset_x_categorical, dataset_y_categorical = reader.get_dataset_categorical()
 x_test_set = reader.get_testset_categorical()
 
-test_indices = int(len(x_claimed_money_categorical) * 0.7)
-valid_indices = int(len(x_claimed_money_categorical - test_indices))
+
+test_indices = int(len(dataset_x_categorical) * 0.7)
+valid_indices = int(len(dataset_x_categorical - test_indices))
 
 print("Splitting dataset into training and test set...")
-test_x = x_claimed_money_categorical.loc[0:test_indices]
-test_y = y_claimed_money_categorical.loc[0:test_indices]
-valid_x = x_claimed_money_categorical.drop(x_claimed_money_categorical.index[test_indices:len(x_claimed_money_categorical)])
-valid_y = y_claimed_money_categorical.drop(y_claimed_money_categorical.index[test_indices:len(x_claimed_money_categorical)])
+test_x = dataset_x_categorical.loc[0:test_indices]
+test_y = dataset_y_categorical.loc[0:test_indices]
+valid_x = dataset_x_categorical.drop(dataset_x_categorical.index[test_indices:len(dataset_x_categorical)])
+valid_y = dataset_y_categorical.drop(dataset_y_categorical.index[test_indices:len(dataset_y_categorical)])
 
-n_neighbors = [1]
+large_x, large_y = reader.get_large_claims_categorical()
+small_x, small_y = reader.get_small_claims_categorical()
+# print(test_x.shape[1], large_x.shape[1], small_x.shape[1])
+
+n_neighbors = range(1, 15)
 
 
 def test_model(input_values, output_values):
@@ -37,7 +42,7 @@ def test_model(input_values, output_values):
     print("Model assessment MAE:", np.mean(cv_error))
 
 
-test_model(test_x, test_y)
+# test_model(test_x, test_y)
 
 
 # dv.plot_line_graph(train_error, cv_error, n_neighbors, "Error", "Degrees", "Classification error graph")
@@ -62,12 +67,14 @@ test_predictions = []
 print(np.count_nonzero(valid_y))
 print("Filtering Data...")
 small_claims, large_claims, claim_collection = knn.knn_filter(valid_x, 1)
+# print(small_claims.shape[1], large_claims.shape[1], small_x.shape[1], large_x.shape[1])
+
 print(np.count_nonzero(claim_collection))
 print("Predicting...")
-print(len(small_claims), len(large_claims))
+# print(len(small_claims), len(large_claims))
 # predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(x_claimed_money_categorical.shape[1]), x_claimed_money_categorical, y_claimed_money_categorical, prediction_set, None, 100)
-small_predictions = pg.poly_reg_predict(small_claims, test_x, test_y, 1)
-large_predictions = pg.poly_reg_predict(large_claims, test_x, test_y, 1)
+small_predictions = pg.poly_reg_predict(small_claims, small_x, small_y, 1)
+large_predictions = pg.poly_reg_predict(large_claims, large_x, large_y, 1)
 print("Generating a list of claims for F1 score...")
 list_of_claims = []
 for i in claim_collection:
@@ -82,20 +89,24 @@ print("Generating full list of predictions...")
 j = 0
 k = 0
 full_prediction = []
+print("Number of claims: ", len(small_predictions) + len(large_predictions), np.count_nonzero(claim_collection))
 for i in claim_collection:
     if i == 1 and small_predictions[j] > 0:
-        full_prediction.append(small_predictions[j])
+        full_prediction.append(abs(small_predictions[j]))
         j += 1
     elif i == 2 and large_predictions[k] > 0:
-        full_prediction.append(large_predictions[k])
+        full_prediction.append(abs(large_predictions[k]))
         k += 1
     else:
         full_prediction.append(0)
+
 # print('f1_score', f1_score)
 # print(len(predictions), len(valid_y))
 
 # for i in full_prediction:
 #     print(i)
+
+print(np.count_nonzero(full_prediction), np.count_nonzero(valid_y))
 
 print('Outputting CSV...')
 output = pd.DataFrame()
@@ -104,6 +115,15 @@ output['rowIndex'] = rowIndex
 # output = pd.DataFrame(full_prediction, columns=['ClaimAmount'])
 output['ClaimAmount'] = full_prediction
 output.to_csv('predictedclaimamount.csv', index=False)
+
+test_output = pd.DataFrame()
+rowIndex = range(len(full_prediction))
+test_output['rowIndex'] = rowIndex
+test_output['ClaimAmount'] = full_prediction
+test_output['Real Amount'] = valid_y
+test_output['Claim Type'] = claim_collection
+test_output.to_csv('testclaims.csv', index=False)
+
 
 print(np.mean(abs(full_prediction - valid_y)))
 #

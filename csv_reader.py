@@ -41,12 +41,12 @@ def onehot(dataframe):
     TEXT = 'onehot|'
     print(TEXT, 'Making onehot')
     NEW_DATA = {'feature3': range(0,9), 'feature6': range(0, 52),
-     'feature7': range(0, 4), 'feature11': range(0, 9),
-     'feature12': range(0, 27), 'feature13': range(0, 6),
-     'feature14': range(0, 4), 'feature15': range(0, 10),
-     'feature16': range(0, 6), 'feature17': range(1, 21),
-     'feature18': range(0, 3)
-     }
+                'feature7': range(0, 4), 'feature11': range(0, 9),
+                'feature12': range(0, 27), 'feature13': range(0, 6),
+                'feature14': range(0, 4), 'feature15': range(0, 10),
+                'feature16': range(0, 6), 'feature17': range(1, 21),
+                'feature18': range(0, 3)
+                }
     new_dataframe = pd.DataFrame()
     for key in dataframe.keys().values:
         if key not in NEW_DATA.keys():
@@ -74,7 +74,7 @@ def normalization(dataframe):
 
 
 training_data = pd.read_csv('trainingset.csv')
-training_data = training_data.sample(frac=1).reset_index(drop=True)
+# training_data = training_data.sample(frac=1).reset_index(drop=True)
 training_data.drop('rowIndex', axis=1, inplace=True)
 test_data = pd.read_csv('competitionset.csv')
 test_data.drop('rowIndex', axis=1, inplace=True)
@@ -91,6 +91,16 @@ claimed_money = training_data[training_data.ClaimAmount != 0]
 not_claimed_categorical = onehot(not_claimed)
 claimed_money_categorical = onehot(claimed_money)
 training_data_categorical = onehot(training_data)
+
+large_claim_categorical = training_data_categorical[training_data_categorical.ClaimAmount > 1000]
+small_claim_categorical = training_data_categorical[training_data_categorical.ClaimAmount < 1000]
+small_claim_categorical = small_claim_categorical[small_claim_categorical.ClaimAmount > 0]
+
+x_large_claim = large_claim_categorical.drop('ClaimAmount', axis=1, inplace=False)
+y_large_claim = large_claim_categorical.loc[:, 'ClaimAmount']
+
+x_small_claim = small_claim_categorical.drop('ClaimAmount', axis=1, inplace=False)
+y_small_claim = small_claim_categorical.loc[:, 'ClaimAmount']
 
 print('Not claim: ', len(not_claimed), '\t\tClaimed Money: ', len(claimed_money))
 
@@ -117,6 +127,14 @@ y_not_claimed_categorical = not_claimed.loc[:, 'ClaimAmount']
 
 def get_dataset_categorical():
     return normalization(x_training_data_categorical), y_training_data_categorical
+
+
+def get_small_claims_categorical():
+    return normalization(x_small_claim), y_small_claim
+
+
+def get_large_claims_categorical():
+    return normalization(x_large_claim), y_large_claim
 
 
 def get_claims():
