@@ -101,7 +101,7 @@ y_not_claimed_categorical = not_claimed.loc[:, 'ClaimAmount']
 
 
 def get_dataset_categorical():
-    return x_training_data_categorical, y_training_data_categorical
+    return normalization(x_training_data_categorical), y_training_data_categorical
 
 
 def get_claims():

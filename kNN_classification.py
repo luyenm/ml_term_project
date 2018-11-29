@@ -21,8 +21,6 @@ def knn_classifier(claimed_x, claimed_y, r, k_folds):
     for i in range(k_folds):
         claim_train = []
         claim_validation = []
-        training_incorrect = 0
-        cv_incorrect = 0
         index_start = int(i * number_of_fold_indexes)
         index_end = int(len(claimed_x) - (number_of_fold_indexes * (k_folds - i - 1)))
         validation_x = claimed_x.drop(claimed_x.index[0:index_start])
@@ -33,30 +31,35 @@ def knn_classifier(claimed_x, claimed_y, r, k_folds):
         train_y = claimed_y.drop(claimed_y.index[index_start:index_end])
 
         for j in train_y:
-            if j != 0:
+            if j == 0:
+                claim_train.append(0)
+            elif j < 1000:
                 claim_train.append(1)
             else:
-                claim_train.append(0)
+                claim_train.append(2)
         for j in validation_y:
-            if j != 0:
+            if j == 0:
+                claim_validation.append(0)
+            elif j < 1000:
                 claim_validation.append(1)
             else:
-                claim_validation.append(0)
-
+                claim_validation.append(2)
+        print("Fitting model for k fold of K =", i)
         model.fit(X=train_x, y=claim_train)
+        print("Predicting training set..")
         training_predictions = model.predict(train_x)
-        print(claim_train.count(1), np.unique(training_predictions, return_counts=True))
+        print("Training model data:",
+              claim_train.count(1),
+              claim_train.count(2),
+              np.unique(training_predictions, return_counts=True))
+        print("Predicting CV set...")
         cv_predictions = model.predict(validation_x)
-        for j in range(len(training_predictions)):
-            if training_predictions[j] != claim_train[j]:
-                training_incorrect += 1
-        for j in range(len(cv_predictions)):
-            # print("Cross validation predicton:", cv_predictions[j], "Actual Prediction: ", validation_y.tolist()[j])
-            if cv_predictions[j] != claim_validation[j]:
-                cv_incorrect += 1
-        train_error.append(training_incorrect/len(training_predictions))
-        cv_error.append(cv_incorrect/len(cv_predictions))
-
+        print("CV Model data:",
+              claim_validation.count(1),
+              claim_validation.count(2),
+              np.unique(cv_predictions, return_counts=True))
+        train_error.append(np.mean((np.size(claim_train) - np.count_nonzero(training_predictions == claim_train))))
+        cv_error.append(np.mean(np.size(claim_validation) - np.count_nonzero(cv_predictions == claim_validation)))
     return np.mean(train_error), np.mean(cv_error)
 
 

@@ -21,17 +21,25 @@ test_x = x_claimed_money_categorical.loc[0:test_indices]
 test_y = y_claimed_money_categorical.loc[0:test_indices]
 valid_x = x_claimed_money_categorical.drop(x_claimed_money_categorical.index[test_indices:len(x_claimed_money_categorical)])
 valid_y = y_claimed_money_categorical.drop(y_claimed_money_categorical.index[test_indices:len(x_claimed_money_categorical)])
-kfolds = [2, 3, 4, 5, 6, 7, 8, 9, 10]
-n_neighbors = [0.001, 0.01, 0.1, 1, 5, 10, 100]
 
-# mae = []
-# train_error = []
-# cv_error = []
-# for k in n_neighbors:
-#     te, cve = svc.svc_kfold_cv(x_claimed_money_categorical, y_claimed_money_categorical, k, 5)
-#     print("Training Error", te, "CV Error", cve, "C Value", k)
-#     train_error.append(te)
-#     cv_error.append(cve)
+n_neighbors = range(1, 15)
+
+
+def test_model(input_values, output_values):
+    mae = []
+    train_error = []
+    cv_error = []
+    for k in n_neighbors:
+        te, cve = knn.knn_classifier(input_values, output_values, k, 5)
+        print("Training Error", te, "CV Error", cve, "C Value", k)
+        train_error.append(te)
+        cv_error.append(cve)
+    print("Model assessment MAE:", np.mean(cv_error))
+
+
+test_model(test_x, test_y)
+
+
 # dv.plot_line_graph(train_error, cv_error, n_neighbors, "Error", "Degrees", "Classification error graph")
 
 # data = reader.get_trainset()
@@ -53,11 +61,11 @@ test_predictions = []
 
 print(np.count_nonzero(valid_y))
 print("Filtering Data...")
-prediction_set, claim_collection = knn.knn_filter(x_test_set, valid_y, 1)
+prediction_set, claim_collection = knn.knn_filter(test_x, valid_y, 1)
 print(np.count_nonzero(claim_collection))
 print("Predicting...")
 # predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(x_claimed_money_categorical.shape[1]), x_claimed_money_categorical, y_claimed_money_categorical, prediction_set, None, 100)
-predictions = pg.poly_reg_predict(prediction_set, x_claimed_money_categorical, y_claimed_money_categorical, 1)
+predictions = pg.poly_reg_predict(prediction_set, test_x, test_y, 1)
 
 print("Generating a list of claims for F1 score...")
 list_of_claims = []
@@ -94,7 +102,7 @@ output['rowIndex'] = rowIndex
 output['ClaimAmount'] = full_prediction
 output.to_csv('predictedclaimamount.csv', index=False)
 
-# print(np.mean(abs(full_prediction - valid_y)))
+print(np.mean(abs(full_prediction - valid_y)))
 #
 # for i in range(len(claim_collection)):
 #     print('{:7.2f}'.format(full_prediction[i]), "\t\t\t", valid_y[i])
