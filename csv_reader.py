@@ -61,7 +61,7 @@ def normalization(dataframe):
 training_data = pd.read_csv('trainingset.csv')
 training_data = training_data.sample(frac=1).reset_index(drop=True)
 training_data.drop('rowIndex', axis=1, inplace=True)
-test_data = pd.read_csv('testset.csv')
+test_data = pd.read_csv('competitionset.csv')
 test_data.drop('rowIndex', axis=1, inplace=True)
 
 
@@ -101,7 +101,7 @@ y_not_claimed_categorical = not_claimed.loc[:, 'ClaimAmount']
 
 
 def get_dataset_categorical():
-    return normalization(x_training_data_categorical), y_training_data_categorical
+    return x_training_data_categorical, y_training_data_categorical
 
 
 def get_claims():
@@ -109,7 +109,7 @@ def get_claims():
 
 
 def get_claims_categorical():
-    return x_claimed_money_categorical, y_claimed_money_categorical
+    return normalization(x_claimed_money_categorical), y_claimed_money_categorical
 
 
 def get_unclaimed():

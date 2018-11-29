@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow_regression as tf_reg
 import scv_classification as svc
 from sklearn import metrics as sklearn_metrics
+import pandas as pd
 
 print("Getting datasets...")
 x_claimed_money_categorical, y_claimed_money_categorical = reader.get_dataset_categorical()
@@ -55,7 +56,7 @@ print("Filtering Data...")
 prediction_set, claim_collection = knn.knn_filter(x_test_set, valid_y, 1)
 print(np.count_nonzero(claim_collection))
 print("Predicting...")
-# predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(test_x.shape[1]), test_x, test_y, prediction_set, None, 100)
+# predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(x_claimed_money_categorical.shape[1]), x_claimed_money_categorical, y_claimed_money_categorical, prediction_set, None, 100)
 predictions = pg.poly_reg_predict(prediction_set, x_claimed_money_categorical, y_claimed_money_categorical, 1)
 
 print("Generating a list of claims for F1 score...")
@@ -82,8 +83,16 @@ for i in claim_collection:
 # print('f1_score', f1_score)
 print(len(predictions), len(valid_y))
 
-for i in full_prediction:
-    print(i)
+# for i in full_prediction:
+#     print(i)
+
+print('Outputting CSV...')
+output = pd.DataFrame()
+rowIndex = range(len(full_prediction))
+output['rowIndex'] = rowIndex
+# output = pd.DataFrame(full_prediction, columns=['ClaimAmount'])
+output['ClaimAmount'] = full_prediction
+output.to_csv('predictedclaimamount.csv', index=False)
 
 # print(np.mean(abs(full_prediction - valid_y)))
 #
