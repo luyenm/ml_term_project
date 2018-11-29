@@ -3,6 +3,7 @@ import numpy as np
 import data_visualizer as dv
 import poly_reg as pg
 import os
+from sklearn import preprocessing
 
 
 '''
@@ -48,6 +49,15 @@ def onehot(dataframe):
     return raw_data
 
 
+def normalization(dataframe):
+    weighted = dataframe.values
+    min_max = preprocessing.MinMaxScaler()
+    scaled = min_max.fit_transform(weighted)
+    norm_frame = pd.DataFrame(scaled)
+    norm_frame.columns = dataframe.columns.values
+    return norm_frame
+
+
 training_data = pd.read_csv('trainingset.csv')
 training_data = training_data.sample(frac=1).reset_index(drop=True)
 training_data.drop('rowIndex', axis=1, inplace=True)
@@ -91,7 +101,7 @@ y_not_claimed_categorical = not_claimed.loc[:, 'ClaimAmount']
 
 
 def get_dataset_categorical():
-    return x_training_data_categorical, y_training_data_categorical
+    return normalization(x_training_data_categorical), y_training_data_categorical
 
 
 def get_claims():

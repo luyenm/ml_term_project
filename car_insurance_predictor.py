@@ -8,12 +8,14 @@ import tensorflow_regression as tf_reg
 import scv_classification as svc
 from sklearn import metrics as sklearn_metrics
 
+print("Getting datasets...")
 x_claimed_money_categorical, y_claimed_money_categorical = reader.get_dataset_categorical()
 x_test_set = reader.get_testset_categorical()
 
 test_indices = int(len(x_claimed_money_categorical) * 0.7)
 valid_indices = int(len(x_claimed_money_categorical - test_indices))
 
+print("Splitting dataset into training and test set...")
 test_x = x_claimed_money_categorical.loc[0:test_indices]
 test_y = y_claimed_money_categorical.loc[0:test_indices]
 valid_x = x_claimed_money_categorical.drop(x_claimed_money_categorical.index[test_indices:len(x_claimed_money_categorical)])
@@ -49,20 +51,24 @@ n_neighbors = [0.001, 0.01, 0.1, 1, 5, 10, 100]
 test_predictions = []
 
 print(np.count_nonzero(valid_y))
-prediction_set, claim_collection = knn.knn_filter(valid_x, 1)
+print("Filtering Data...")
+prediction_set, claim_collection = knn.knn_filter(valid_x, valid_y, 1)
 print(np.count_nonzero(claim_collection))
+print("Predicting...")
 # predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(test_x.shape[1]), test_x, test_y, prediction_set, None, 100)
-predictions = pg.poly_reg_predict(prediction_set, test_x, test_y, 1)
+predictions = pg.poly_reg_predict(prediction_set, test_x, test_y, 2)
 
+print("Generating a list of claims for F1 score...")
 list_of_claims = []
-for i in valid_y:
+for i in claim_collection:
     if i > 0:
         list_of_claims.append(1)
     else:
         list_of_claims.append(0)
 
-f1_score = sklearn_metrics.f1_score(list_of_claims, claim_collection, average='micro')
+# f1_score = sklearn_metrics.f1_score(prediction_y, predictions, average='macro')
 
+print("Generating full list of predictions...")
 j = 0
 full_prediction = []
 for i in claim_collection:
@@ -73,7 +79,7 @@ for i in claim_collection:
         j += 1
     else:
         full_prediction.append(0)
-print('f1_score', f1_score)
+# print('f1_score', f1_score)
 print(len(predictions), len(valid_y))
 
 print(np.mean(abs(full_prediction - valid_y)))
