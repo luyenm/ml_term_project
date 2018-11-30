@@ -126,15 +126,15 @@ y_not_claimed_categorical = not_claimed.loc[:, 'ClaimAmount']
 
 
 def get_dataset_categorical():
-    return normalization(x_training_data_categorical), y_training_data_categorical
+    return x_training_data_categorical, y_training_data_categorical
 
 
 def get_small_claims_categorical():
-    return normalization(x_small_claim), y_small_claim
+    return x_small_claim, y_small_claim
 
 
 def get_large_claims_categorical():
-    return normalization(x_large_claim), y_large_claim
+    return x_large_claim, y_large_claim
 
 
 def get_claims():
