@@ -8,6 +8,9 @@ import tensorflow_regression as tf_reg
 import scv_classification as svc
 from sklearn import metrics as sklearn_metrics
 import pandas as pd
+import pickle as pk
+
+guesses = []
 
 print("Getting datasets...")
 x_claimed_money_categorical, y_claimed_money_categorical = reader.get_dataset_categorical()
@@ -53,11 +56,20 @@ test_predictions = []
 
 print(np.count_nonzero(valid_y))
 print("Filtering Data...")
-prediction_set, claim_collection = knn.knn_filter(valid_x, valid_y, 1)
+prediction_set, claim_collection = knn.knn_filter(valid_x, 1)
+# prediction_set, claim_collection = knn.knn_model_predict(valid_x)
 print(np.count_nonzero(claim_collection))
 print("Predicting...")
 # predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(x_claimed_money_categorical.shape[1]), x_claimed_money_categorical, y_claimed_money_categorical, prediction_set, None, 100)
 predictions = pg.poly_reg_predict(prediction_set, test_x, test_y, 1)
+
+# print("Pickling model...")
+# model = {"knn": knn_model,
+#          "poly": poly_reg_model}
+#
+# saved_model = open("saved_model.p", "wb")
+# pk.dump(model, saved_model)
+# saved_model.close()
 
 print("Generating a list of claims for F1 score...")
 list_of_claims = []
@@ -82,8 +94,8 @@ for i in claim_collection:
     else:
         full_prediction.append(0)
 # print('f1_score', f1_score)
-print(np.count_nonzero(full_prediction), np.count_nonzero(valid_y))
-print(np.mean(abs(full_prediction - valid_y)))
+# print(np.count_nonzero(full_prediction), np.count_nonzero(valid_y))
+print("MAE: ", np.mean(abs(full_prediction - valid_y)))
 
 # for i in full_prediction:
 #     print(i)
@@ -93,8 +105,15 @@ output = pd.DataFrame()
 rowIndex = range(len(full_prediction))
 output['rowIndex'] = rowIndex
 # output = pd.DataFrame(full_prediction, columns=['ClaimAmount'])
+print(len(full_prediction))
 output['ClaimAmount'] = full_prediction
-output.to_csv('predictedclaimamount.csv', index=False)
+output.to_csv('testsetsubmission_5_2.csv', index=False)
+
+# test_output = pd.DataFrame()
+# test_output['rowIndex'] = range(len(full_prediction))
+# test_output['ClaimAmount'] = full_prediction
+# # test_output['ActualValues'] = valid_y
+# test_output.to_csv('testsetsubmission_5_1.csv', index=False)
 
 #
 # for i in range(len(claim_collection)):

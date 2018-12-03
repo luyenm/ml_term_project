@@ -76,4 +76,8 @@ def poly_reg_predict(input_x, training_input, training_output, degree):
     ploy_reg_input = PolynomialFeatures(degree)
     input_x_transform = ploy_reg_input.fit_transform(input_x)
     predictions = lin_reg.predict(X=input_x_transform)
-    return predictions
+    return predictions, lin_reg
+
+
+def poly_reg_model_predict(input_x, model):
+    return model.predict(input_x)

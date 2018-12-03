@@ -60,7 +60,7 @@ def knn_classifier(claimed_x, claimed_y, r, k_folds):
     return np.mean(train_error), np.mean(cv_error)
 
 
-def knn_filter(input_x, input_y, k_neighbors):
+def knn_filter(input_x, k_neighbors):
     training_x, training_y = reader.get_dataset_categorical()
     print(training_x.loc[[0]])
     print(input_x.loc[[0]])
@@ -82,4 +82,15 @@ def knn_filter(input_x, input_y, k_neighbors):
         if predictions[i] == 1:
             filtered_x = filtered_x.append(input_x.loc[[i]])
             filtered_y.append(input_y.loc[[i]])
+    return filtered_x, predictions, model
+
+
+def knn_model_predict(input_x, model):
+    filtered_x = pd.DataFrame(data=input_x)
+    filtered_x = filtered_x.drop(filtered_x.index[0:len(filtered_x)])
+    claim_count = []
+    predictions = model.predict(input_x)
+    for i in range(len(input_x)):
+        if predictions[i] == 1:
+            filtered_x = filtered_x.append(input_x.loc[[i]])
     return filtered_x, predictions
