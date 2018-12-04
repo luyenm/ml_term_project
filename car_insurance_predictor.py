@@ -9,6 +9,7 @@ import scv_classification as svc
 from sklearn import metrics as sklearn_metrics
 import pandas as pd
 import pickle as pk
+from pathlib import Path
 
 guesses = []
 
@@ -55,23 +56,41 @@ n_neighbors = [0.001, 0.01, 0.1, 1, 5, 10, 100]
 test_predictions = []
 
 print(np.count_nonzero(valid_y))
-print("Filtering Data...")
-prediction_set, claim_collection = knn.knn_filter(valid_x, 1)
-# prediction_set, claim_collection = knn.knn_model_predict(valid_x)
-print(np.count_nonzero(claim_collection))
-print("Predicting...")
-# predictions = tf_reg.adadelta_cv(tf_reg.build_Adadelta(x_claimed_money_categorical.shape[1]), x_claimed_money_categorical, y_claimed_money_categorical, prediction_set, None, 100)
-predictions = pg.poly_reg_predict(prediction_set, test_x, test_y, 1)
 
-# print("Pickling model...")
-# model = {"knn": knn_model,
-#          "poly": poly_reg_model}
-#
-# saved_model = open("saved_model.p", "wb")
-# pk.dump(model, saved_model)
-# saved_model.close()
 
-print("Generating a list of claims for F1 score...")
+pickle_path = Path('saved_model.p')
+competition_set_path = Path('competitionset.csv')
+
+if not pickle_path.exists():
+    print("Saved model not found, training...")
+    print("Filtering Data...")
+    prediction_set, claim_collection, knn_model = knn.knn_filter(valid_x, 1)
+    print(np.count_nonzero(claim_collection))
+    print("Predicting...")
+    predictions, poly_reg_model = pg.poly_reg_predict(prediction_set, test_x, test_y, 1)
+    print("Pickling model...")
+    model = {"knn": knn_model,
+             "poly": poly_reg_model}
+
+    saved_model = open("saved_model.p", "wb")
+    pk.dump(model, saved_model)
+    saved_model.close()
+else:
+    print("Found saved model, predicting.")
+    loaded_model = pk.load(open('saved_model.p', "rb"))
+    kneighbors_model = loaded_model['knn']
+    polynomial_model = loaded_model['poly']
+
+    if competition_set_path.exists():
+        prediction_set, claim_collection = knn.knn_model_predict(valid_x, kneighbors_model)
+        predictions = pg.poly_reg_model_predict(prediction_set, polynomial_model)
+    else:
+        prediction_set, claim_collection = knn.knn_model_predict(valid_x, kneighbors_model)
+        predictions = pg.poly_reg_model_predict(prediction_set, polynomial_model)
+
+
+
+
 list_of_claims = []
 for i in claim_collection:
     if i > 0:

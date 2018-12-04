@@ -69,13 +69,15 @@ def ridge_kfold_cv(training_input, training_output, a, k_folds):
 
 
 def poly_reg_predict(input_x, training_input, training_output, degree):
-    lin_reg = LinearRegression(fit_intercept=True, normalize=False)
-    poly_reg = PolynomialFeatures(degree)
-    x_transform = poly_reg.fit_transform(training_input)
-    lin_reg.fit(x_transform, training_output)
-    ploy_reg_input = PolynomialFeatures(degree)
-    input_x_transform = ploy_reg_input.fit_transform(input_x)
-    predictions = lin_reg.predict(X=input_x_transform)
+    # lin_reg = LinearRegression(fit_intercept=True, normalize=False)
+    # poly_reg = PolynomialFeatures(degree)
+    # x_transform = poly_reg.fit_transform(training_input)
+    # lin_reg.fit(x_transform, training_output)
+    # ploy_reg_input = PolynomialFeatures(degree)
+    # input_x_transform = ploy_reg_input.fit_transform(input_x)
+    lin_reg = LinearRegression()
+    lin_reg.fit(training_input, training_output)
+    predictions = lin_reg.predict(X=input_x)
     return predictions, lin_reg
 
 

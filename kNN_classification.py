@@ -81,14 +81,14 @@ def knn_filter(input_x, k_neighbors):
     for i in range(len(input_x)):
         if predictions[i] == 1:
             filtered_x = filtered_x.append(input_x.loc[[i]])
-            filtered_y.append(input_y.loc[[i]])
+            # filtered_y.append(input_y.loc[[i]])
     return filtered_x, predictions, model
 
 
 def knn_model_predict(input_x, model):
     filtered_x = pd.DataFrame(data=input_x)
     filtered_x = filtered_x.drop(filtered_x.index[0:len(filtered_x)])
-    claim_count = []
+    # claim_count = []
     predictions = model.predict(input_x)
     for i in range(len(input_x)):
         if predictions[i] == 1:

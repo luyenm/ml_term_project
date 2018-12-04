@@ -80,7 +80,7 @@ def normalization(dataframe):
     norm_frame.columns = dataframe.columns.values
     return norm_frame
 
-
+competitive_set = None
 training_data = pd.read_csv('trainingset.csv')
 # training_data = training_data.sample(frac=1).reset_index(drop=True)
 training_data.drop('rowIndex', axis=1, inplace=True)
@@ -149,3 +149,7 @@ def get_testset():
 
 def get_testset_categorical():
     return onehot(test_data)
+
+
+def get_competitive_set_categorical():
+    return onehot(competitive_set)
