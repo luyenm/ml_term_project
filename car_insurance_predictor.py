@@ -56,18 +56,15 @@ n_neighbors = [0.001, 0.01, 0.1, 1, 5, 10, 100]
 
 test_predictions = []
 
-print(np.count_nonzero(valid_y))
-
-
 pickle_path = Path('saved_model.p')
 competition_set_path = Path('competitionset.csv')
-
+test_path = Path('testset.csv')
 if not pickle_path.exists():
     print("Saved model not found, training...")
     print("Filtering Data...")
     prediction_set, claim_collection, knn_model = knn.knn_filter(x_claimed_money_categorical, 1)
     print(np.count_nonzero(claim_collection))
-    print("Predicting...")
+    print("Generating linear regression model...")
     predictions, poly_reg_model = pg.poly_reg_predict(prediction_set, x_claimed_money_categorical, y_claimed_money_categorical, 1)
     print("Pickling model...")
     model = {"knn": knn_model,
@@ -89,11 +86,62 @@ else:
         competition_set = reader.get_competitive_set_categorical()
         prediction_set, claim_collection = knn.knn_model_predict(competition_set, kneighbors_model)
         predictions = pg.poly_reg_model_predict(prediction_set, polynomial_model)
-    else:
-        prediction_set, claim_collection = knn.knn_model_predict(valid_x, kneighbors_model)
+
+        print("Generating full list of predictions...")
+        j = 0
+        full_prediction = []
+        for i in claim_collection:
+            if i == 1:
+                if predictions[j] <= 0:
+                    predictions[j] = abs(predictions[j])
+                full_prediction.append(predictions[j])
+                j += 1
+            else:
+                full_prediction.append(0)
+
+        print('Outputting CSV...')
+        output = pd.DataFrame()
+        rowIndex = range(len(full_prediction))
+        output['rowIndex'] = rowIndex
+        output['ClaimAmount'] = full_prediction
+        output.to_csv('competition_predictions.csv', index=False)
+    if test_path.exists():
+        print("Found test set... predicting..")
+        competition_set = reader.get_competitive_set_categorical()
+        prediction_set, claim_collection = knn.knn_model_predict(competition_set, kneighbors_model)
         predictions = pg.poly_reg_model_predict(prediction_set, polynomial_model)
+        print("Generating full list of predictions...")
+        j = 0
+        full_prediction = []
+        for i in claim_collection:
+            if i == 1:
+                if predictions[j] <= 0:
+                    predictions[j] = abs(predictions[j])
+                full_prediction.append(predictions[j])
+                j += 1
+            else:
+                full_prediction.append(0)
+        print('Outputting CSV...')
+        output = pd.DataFrame()
+        rowIndex = range(len(full_prediction))
+        output['rowIndex'] = rowIndex
+        output['ClaimAmount'] = full_prediction
+        output.to_csv('test_predictions.csv', index=False)
 
-
+    prediction_set, claim_collection = knn.knn_model_predict(valid_x, kneighbors_model)
+    predictions = pg.poly_reg_model_predict(prediction_set, polynomial_model)
+    j = 0
+    full_prediction = []
+    for i in claim_collection:
+        if i == 1:
+            if predictions[j] <= 0:
+                predictions[j] = abs(predictions[j])
+            full_prediction.append(predictions[j])
+            j += 1
+        else:
+            full_prediction.append(0)
+    mae = np.mean(abs(full_prediction - valid_y))
+    print("MAE: ", mae)
 
 
 list_of_claims = []
@@ -105,34 +153,3 @@ for i in claim_collection:
 
 
 # f1_score = sklearn_metrics.f1_score(prediction_y, predictions, average='macro')
-
-print("Generating full list of predictions...")
-j = 0
-full_prediction = []
-for i in claim_collection:
-    if i == 1:
-        if predictions[j] <= 0:
-            predictions[j] = abs(predictions[j])
-        full_prediction.append(predictions[j])
-        j += 1
-    else:
-        full_prediction.append(0)
-# print('f1_score', f1_score)
-# print(np.count_nonzero(full_prediction), np.count_nonzero(valid_y))
-# print("MAE: ", np.mean(abs(full_prediction - valid_y)))
-
-# for i in full_prediction:
-#     print(i)
-
-print('Outputting CSV...')
-output = pd.DataFrame()
-rowIndex = range(len(full_prediction))
-output['rowIndex'] = rowIndex
-# output = pd.DataFrame(full_prediction, columns=['ClaimAmount'])
-print(len(full_prediction))
-output['ClaimAmount'] = full_prediction
-output.to_csv('predictions.csv', index=False)
-
-#
-# for i in range(len(claim_collection)):
-#     print('{:7.2f}'.format(full_prediction[i]), "\t\t\t", valid_y[i])
