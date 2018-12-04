@@ -28,6 +28,7 @@ valid_y = y_claimed_money_categorical.drop(y_claimed_money_categorical.index[tes
 kfolds = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 n_neighbors = [0.001, 0.01, 0.1, 1, 5, 10, 100]
 
+
 # mae = []
 # train_error = []
 # cv_error = []
@@ -64,10 +65,10 @@ competition_set_path = Path('competitionset.csv')
 if not pickle_path.exists():
     print("Saved model not found, training...")
     print("Filtering Data...")
-    prediction_set, claim_collection, knn_model = knn.knn_filter(valid_x, 1)
+    prediction_set, claim_collection, knn_model = knn.knn_filter(x_claimed_money_categorical, 1)
     print(np.count_nonzero(claim_collection))
     print("Predicting...")
-    predictions, poly_reg_model = pg.poly_reg_predict(prediction_set, test_x, test_y, 1)
+    predictions, poly_reg_model = pg.poly_reg_predict(prediction_set, x_claimed_money_categorical, y_claimed_money_categorical, 1)
     print("Pickling model...")
     model = {"knn": knn_model,
              "poly": poly_reg_model}
@@ -75,6 +76,8 @@ if not pickle_path.exists():
     saved_model = open("saved_model.p", "wb")
     pk.dump(model, saved_model)
     saved_model.close()
+    print("Model trained, please run the program again.")
+    exit(0)
 else:
     print("Found saved model, predicting.")
     loaded_model = pk.load(open('saved_model.p', "rb"))
@@ -82,7 +85,9 @@ else:
     polynomial_model = loaded_model['poly']
 
     if competition_set_path.exists():
-        prediction_set, claim_collection = knn.knn_model_predict(valid_x, kneighbors_model)
+        print("Found competition set... predicting..")
+        competition_set = reader.get_competitive_set_categorical()
+        prediction_set, claim_collection = knn.knn_model_predict(competition_set, kneighbors_model)
         predictions = pg.poly_reg_model_predict(prediction_set, polynomial_model)
     else:
         prediction_set, claim_collection = knn.knn_model_predict(valid_x, kneighbors_model)
@@ -114,7 +119,7 @@ for i in claim_collection:
         full_prediction.append(0)
 # print('f1_score', f1_score)
 # print(np.count_nonzero(full_prediction), np.count_nonzero(valid_y))
-print("MAE: ", np.mean(abs(full_prediction - valid_y)))
+# print("MAE: ", np.mean(abs(full_prediction - valid_y)))
 
 # for i in full_prediction:
 #     print(i)
@@ -126,13 +131,7 @@ output['rowIndex'] = rowIndex
 # output = pd.DataFrame(full_prediction, columns=['ClaimAmount'])
 print(len(full_prediction))
 output['ClaimAmount'] = full_prediction
-output.to_csv('testsetsubmission_5_2.csv', index=False)
-
-# test_output = pd.DataFrame()
-# test_output['rowIndex'] = range(len(full_prediction))
-# test_output['ClaimAmount'] = full_prediction
-# # test_output['ActualValues'] = valid_y
-# test_output.to_csv('testsetsubmission_5_1.csv', index=False)
+output.to_csv('predictions.csv', index=False)
 
 #
 # for i in range(len(claim_collection)):

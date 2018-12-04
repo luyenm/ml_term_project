@@ -1,7 +1,5 @@
 import pandas as pd
-import numpy as np
-import data_visualizer as dv
-import poly_reg as pg
+from pathlib import Path
 import os
 from sklearn import preprocessing
 
@@ -80,7 +78,14 @@ def normalization(dataframe):
     norm_frame.columns = dataframe.columns.values
     return norm_frame
 
-competitive_set = None
+
+competition_set = None
+competition_set_path = Path('competitionset.csv')
+if competition_set_path.exists():
+    competition_set = pd.read_csv('competitionset.csv')
+    competition_set.drop('rowIndex', axis=1, inplace=True)
+
+
 training_data = pd.read_csv('trainingset.csv')
 # training_data = training_data.sample(frac=1).reset_index(drop=True)
 training_data.drop('rowIndex', axis=1, inplace=True)
@@ -152,4 +157,4 @@ def get_testset_categorical():
 
 
 def get_competitive_set_categorical():
-    return onehot(competitive_set)
+    return onehot(competition_set)
