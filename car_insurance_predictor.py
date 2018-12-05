@@ -144,6 +144,6 @@ else:
         else:
             full_prediction.append(0)
     mae = np.mean(abs(full_prediction - valid_y))
-    print("MAE: ", mae)
+    print("training_set MAE: ", mae)
 
 # f1_score = sklearn_metrics.f1_score(prediction_y, predictions, average='macro')
