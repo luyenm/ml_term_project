@@ -15,7 +15,6 @@ guesses = []
 
 print("Getting datasets...")
 x_claimed_money_categorical, y_claimed_money_categorical = reader.get_dataset_categorical()
-x_test_set = reader.get_testset_categorical()
 
 test_indices = int(len(x_claimed_money_categorical) * 0.7)
 valid_indices = int(len(x_claimed_money_categorical - test_indices))
@@ -104,11 +103,13 @@ else:
         rowIndex = range(len(full_prediction))
         output['rowIndex'] = rowIndex
         output['ClaimAmount'] = full_prediction
-        output.to_csv('competition_predictions.csv', index=False)
+        output.to_csv('predictedclaimamount.csv', index=False)
+    else:
+        print("Competition set does not exit.")
     if test_path.exists():
         print("Found test set... predicting..")
-        competition_set = reader.get_competitive_set_categorical()
-        prediction_set, claim_collection = knn.knn_model_predict(competition_set, kneighbors_model)
+        x_test_set = reader.get_testset_categorical()
+        prediction_set, claim_collection = knn.knn_model_predict(x_test_set, kneighbors_model)
         predictions = pg.poly_reg_model_predict(prediction_set, polynomial_model)
         print("Generating full list of predictions...")
         j = 0
@@ -127,6 +128,8 @@ else:
         output['rowIndex'] = rowIndex
         output['ClaimAmount'] = full_prediction
         output.to_csv('test_predictions.csv', index=False)
+    else:
+        print("Test set does not exist")
 
     prediction_set, claim_collection = knn.knn_model_predict(valid_x, kneighbors_model)
     predictions = pg.poly_reg_model_predict(prediction_set, polynomial_model)
@@ -142,14 +145,5 @@ else:
             full_prediction.append(0)
     mae = np.mean(abs(full_prediction - valid_y))
     print("MAE: ", mae)
-
-
-list_of_claims = []
-for i in claim_collection:
-    if i > 0:
-        list_of_claims.append(1)
-    else:
-        list_of_claims.append(0)
-
 
 # f1_score = sklearn_metrics.f1_score(prediction_y, predictions, average='macro')

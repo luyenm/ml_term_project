@@ -80,17 +80,21 @@ def normalization(dataframe):
 
 
 competition_set = None
+test_data = None
 competition_set_path = Path('competitionset.csv')
 if competition_set_path.exists():
     competition_set = pd.read_csv('competitionset.csv')
     competition_set.drop('rowIndex', axis=1, inplace=True)
 
+test_set_path = Path('testset.csv')
+if test_set_path.exists():
+    test_data = pd.read_csv('testset.csv')
+    test_data.drop('rowIndex', axis=1, inplace=True)
+
 
 training_data = pd.read_csv('trainingset.csv')
 # training_data = training_data.sample(frac=1).reset_index(drop=True)
 training_data.drop('rowIndex', axis=1, inplace=True)
-test_data = pd.read_csv('testset.csv')
-test_data.drop('rowIndex', axis=1, inplace=True)
 
 
 if not os.path.exists('scatterplot'):
